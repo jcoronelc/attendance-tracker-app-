@@ -4,15 +4,12 @@ import altair as alt
 import os
 from datetime import date, datetime
 
-# --- Configuración general ---
 st.set_page_config(page_title="Asistencia Scouts", page_icon="🏕️", layout="wide")
 
-# --- Constantes y rutas ---
 USUARIOS_PATH = "data/usuarios.csv"
 ASISTENCIAS_PATH = "data/asistencias.csv"
-ADMIN_PASSWORD = "scout2025"  # 🔒 Contraseña del dirigente
+ADMIN_PASSWORD = "scout2025"  
 
-# --- Funciones auxiliares ---
 def load_usuarios():
     try:
         return pd.read_csv(USUARIOS_PATH)
@@ -28,13 +25,11 @@ def load_asistencias():
     else:
         df = pd.DataFrame(columns=["nombre", "fecha", "estado", "comentario"])
         df.to_csv(ASISTENCIAS_PATH, index=False)
-    # ✅ Normalizar formato de fecha siempre al cargar
     if "fecha" in df.columns:
         df["fecha"] = pd.to_datetime(df["fecha"], errors="coerce")
     return df
 
 def save_asistencias(df):
-    # ✅ Convertir a string ISO al guardar para evitar problemas de tipo
     df["fecha"] = df["fecha"].apply(lambda x: x.strftime("%Y-%m-%d") if pd.notna(x) else "")
     df.to_csv(ASISTENCIAS_PATH, index=False)
 
@@ -71,7 +66,6 @@ def obtener_insignias(historial, racha_actual):
         insignias.append("🌱 En camino a su primera insignia")
     return insignias
 
-# --- Interfaz principal ---
 st.title("🏕️ Sistema de Asistencia Scout")
 
 modo = st.sidebar.radio("Selecciona modo:", ["Participante", "Dirigente"])
@@ -79,7 +73,6 @@ modo = st.sidebar.radio("Selecciona modo:", ["Participante", "Dirigente"])
 usuarios_df = load_usuarios()
 asist_df = load_asistencias()
 
-# --- PARTICIPANTE ---
 if modo == "Participante":
     st.header("👤 Registro de asistencia personal")
 
@@ -155,7 +148,7 @@ if modo == "Participante":
 
             colores_estado = alt.Scale(
                 domain=["Presente", "Ausente justificado", "Ausente injustificado"],
-                range=["#2ecc71", "#3498db", "#e74c3c"]  # verde, azul, rojo
+                range=["#2ecc71", "#3498db", "#e74c3c"] 
             )
             
             chart = alt.Chart(conteo).mark_bar().encode(
@@ -169,7 +162,6 @@ if modo == "Participante":
 
             # Racha e insignias
             racha_actual = calcular_racha(asist_df, nombre)
-            # --- Bloque de estadísticas con mejor diseño ---
             racha_html = f"""
             <div style="
                 background: linear-gradient(135deg, #7650c3 0%, #284594 100%);
@@ -203,7 +195,6 @@ if modo == "Participante":
             </div>
             """
 
-            # Mostrar dos tarjetas lado a lado
             col1, col2 = st.columns(2)
             with col1:
                 st.markdown(racha_html, unsafe_allow_html=True)
